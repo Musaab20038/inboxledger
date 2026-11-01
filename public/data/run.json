@@ -1,0 +1,705 @@
+{
+ "started": "2026-11-01T19:38:04.445Z",
+ "model": "default",
+ "emails": [
+  {
+   "id": "m1",
+   "from": "\"Kessler Rohr & Armatur\" <rechnung@kessler-rohr.example>",
+   "subject": "Rechnung RE-2026-04187",
+   "date": "2026-10-28T06:30:00.000Z",
+   "attachments": [
+    {
+     "name": "invoice-de.pdf",
+     "type": "application/pdf",
+     "bytes": 34364
+    }
+   ],
+   "steps": [
+    {
+     "step": "filter",
+     "result": "document found: invoice-de.pdf"
+    },
+    {
+     "step": "extract",
+     "result": "invoice from Kessler Rohr & Armatur GmbH, total 1813.14 EUR"
+    },
+    {
+     "step": "check",
+     "result": "ok line totals; ok lines vs subtotal; ok total"
+    },
+    {
+     "step": "route",
+     "result": "booked"
+    }
+   ],
+   "extraction": {
+    "seconds": 5.3,
+    "model": "gemini-3.5-flash-lite"
+   },
+   "data": {
+    "document_type": "invoice",
+    "language": "de",
+    "vendor": {
+     "name": "Kessler Rohr & Armatur GmbH",
+     "address": "Hafenstraße 7, 63739 Aschaffenburg",
+     "email": "rechnung@kessler-rohr.example",
+     "phone": "06021 555 0140",
+     "tax_id": "DE000000000"
+    },
+    "customer": {
+     "address": "Lindenallee 23, 63768 Hösbach",
+     "name": "Brandt Haustechnik e.K."
+    },
+    "document_number": {
+     "value": "RE-2026-04187"
+    },
+    "issue_date": {
+     "value": "2026-10-14"
+    },
+    "due_date": {
+     "value": "2026-10-28"
+    },
+    "currency": "EUR",
+    "subtotal": {
+     "value": 1523.65
+    },
+    "tax": {
+     "included_in_prices": false,
+     "rate_percent": 19,
+     "value": 289.49
+    },
+    "total": {
+     "value": 1813.14
+    },
+    "discount": null,
+    "shipping": null,
+    "summary": "This is an invoice from Kessler Rohr & Armatur GmbH to Brandt Haustechnik e.K. for plumbing supplies amounting to 1,813.14 EUR.",
+    "line_items": [
+     {
+      "description": "Kupferrohr 22 x 1,0 mm, Stange 5 m",
+      "amount": 466.8,
+      "quantity": 12,
+      "sku": "10-2241",
+      "unit": "Stk",
+      "unit_price": 38.9
+     },
+     {
+      "description": "Kupferrohr 15 x 1,0 mm, Stange 5 m",
+      "amount": 490,
+      "quantity": 20,
+      "sku": "10-1540",
+      "unit": "Stk",
+      "unit_price": 24.5
+     },
+     {
+      "description": "Pressfitting Bogen 90° 22 mm",
+      "amount": 194,
+      "quantity": 40,
+      "sku": "31-0022",
+      "unit": "Stk",
+      "unit_price": 4.85
+     },
+     {
+      "description": "Pressfitting T-Stück 15 mm",
+      "amount": 138.25,
+      "quantity": 35,
+      "sku": "31-0015",
+      "unit": "Stk",
+      "unit_price": 3.95
+     },
+     {
+      "description": "Kugelhahn DN 25, Messing, PN 40",
+      "amount": 165.6,
+      "quantity": 6,
+      "sku": "55-7100",
+      "unit": "Stk",
+      "unit_price": 27.6
+     },
+     {
+      "description": "Rohrschelle M8 Gr. 22 mit Gummieinlage",
+      "amount": 69,
+      "quantity": 60,
+      "sku": "72-0300",
+      "unit": "Stk",
+      "unit_price": 1.15
+     }
+    ]
+   },
+   "checks": [
+    {
+     "ok": true,
+     "check": "line totals",
+     "detail": "qty x price = amount on every line"
+    },
+    {
+     "ok": true,
+     "check": "lines vs subtotal",
+     "detail": "lines add up to 1523.65"
+    },
+    {
+     "ok": true,
+     "check": "total",
+     "detail": "subtotal and tax add up to the total"
+    }
+   ],
+   "status": "booked",
+   "reason": "All checks passed"
+  },
+  {
+   "id": "m2",
+   "from": "\"Herbst-Aktion\" <newsletter@werkzeugwelt.example>",
+   "subject": "Nur diese Woche: 20 % auf Akkuschrauber",
+   "date": "2026-10-28T07:11:00.000Z",
+   "attachments": [],
+   "steps": [
+    {
+     "step": "filter",
+     "result": "no document attachment"
+    }
+   ],
+   "status": "skipped",
+   "reason": "No PDF or image attached",
+   "data": null
+  },
+  {
+   "id": "m3",
+   "from": "\"Bluegate Billing\" <billing@bluegate.example>",
+   "subject": "Invoice BG-10442 from Bluegate Office Supply",
+   "date": "2026-10-28T08:05:00.000Z",
+   "attachments": [
+    {
+     "name": "invoice-us.pdf",
+     "type": "application/pdf",
+     "bytes": 41031
+    }
+   ],
+   "steps": [
+    {
+     "step": "filter",
+     "result": "document found: invoice-us.pdf"
+    },
+    {
+     "step": "extract",
+     "result": "invoice from Bluegate Office Supply Co., total 2380.26 USD"
+    },
+    {
+     "step": "check",
+     "result": "ok line totals; ok lines vs subtotal; ok total"
+    },
+    {
+     "step": "route",
+     "result": "booked"
+    }
+   ],
+   "extraction": {
+    "seconds": 7.4,
+    "model": "gemini-3.5-flash-lite"
+   },
+   "data": {
+    "document_type": "invoice",
+    "language": "en",
+    "vendor": {
+     "name": "Bluegate Office Supply Co.",
+     "address": "2140 Harbor View Rd, Suite 300, Oakland, CA 94607",
+     "email": "billing@bluegate.example",
+     "phone": null,
+     "tax_id": null
+    },
+    "customer": {
+     "address": "88 Fremont Ave, San Jose, CA 95110",
+     "name": "Marigold Studio LLC"
+    },
+    "document_number": {
+     "value": "BG-10442"
+    },
+    "issue_date": {
+     "value": "2026-10-21"
+    },
+    "due_date": {
+     "value": "2026-11-20"
+    },
+    "currency": "USD",
+    "subtotal": {
+     "value": 2292
+    },
+    "tax": {
+     "included_in_prices": false,
+     "rate_percent": 7.25,
+     "value": 157.86
+    },
+    "total": {
+     "value": 2380.26
+    },
+    "discount": {
+     "value": 114.6
+    },
+    "shipping": {
+     "value": 45
+    },
+    "summary": "Invoice BG-10442 issued by Bluegate Office Supply Co. to Marigold Studio LLC for office furniture and installation services.",
+    "line_items": [
+     {
+      "description": "Ergonomic office chair, mesh back",
+      "amount": 756,
+      "quantity": 4,
+      "sku": null,
+      "unit": null,
+      "unit_price": 189
+     },
+     {
+      "description": "Standing desk frame, dual motor",
+      "amount": 698,
+      "quantity": 2,
+      "sku": null,
+      "unit": null,
+      "unit_price": 349
+     },
+     {
+      "description": "Desktop 63\" x 30\", walnut laminate",
+      "amount": 258,
+      "quantity": 2,
+      "sku": null,
+      "unit": null,
+      "unit_price": 129
+     },
+     {
+      "description": "Monitor arm, single, gas spring",
+      "amount": 255,
+      "quantity": 6,
+      "sku": null,
+      "unit": null,
+      "unit_price": 42.5
+     },
+     {
+      "description": "Assembly & installation service (hours)",
+      "amount": 325,
+      "quantity": 5,
+      "sku": null,
+      "unit": "hours",
+      "unit_price": 65
+     }
+    ]
+   },
+   "checks": [
+    {
+     "ok": true,
+     "check": "line totals",
+     "detail": "qty x price = amount on every line"
+    },
+    {
+     "ok": true,
+     "check": "lines vs subtotal",
+     "detail": "lines add up to 2292.00"
+    },
+    {
+     "ok": true,
+     "check": "total",
+     "detail": "subtotal and tax add up to the total"
+    }
+   ],
+   "status": "booked",
+   "reason": "All checks passed"
+  },
+  {
+   "id": "m4",
+   "from": "\"Jonas Brandt\" <jonas@brandt-haustechnik.example>",
+   "subject": "Beleg Baumarkt (Bohrmaschine)",
+   "date": "2026-10-28T09:30:00.000Z",
+   "attachments": [
+    {
+     "name": "receipt-photo.jpg",
+     "type": "image/jpeg",
+     "bytes": 94144
+    }
+   ],
+   "steps": [
+    {
+     "step": "filter",
+     "result": "document found: receipt-photo.jpg"
+    },
+    {
+     "step": "extract",
+     "result": "receipt from BAUMARKT HOLZWERK, total 118.54 EUR"
+    },
+    {
+     "step": "check",
+     "result": "ok line totals; ok lines vs total; ok total"
+    },
+    {
+     "step": "route",
+     "result": "booked"
+    }
+   ],
+   "extraction": {
+    "seconds": 4.5,
+    "model": "gemini-3.5-flash-lite"
+   },
+   "data": {
+    "document_type": "receipt",
+    "language": "de",
+    "vendor": {
+     "name": "BAUMARKT HOLZWERK",
+     "address": "Würzburger Str. 112, 63743 Aschaffenburg",
+     "email": null,
+     "phone": "06021 555 0199",
+     "tax_id": null
+    },
+    "customer": null,
+    "document_number": {
+     "value": "4471"
+    },
+    "issue_date": {
+     "value": "2026-10-27"
+    },
+    "due_date": null,
+    "currency": "EUR",
+    "subtotal": {
+     "value": 99.61
+    },
+    "tax": {
+     "included_in_prices": true,
+     "rate_percent": 19,
+     "value": 18.93
+    },
+    "total": {
+     "value": 118.54
+    },
+    "discount": null,
+    "shipping": null,
+    "summary": "This is a receipt from BAUMARKT HOLZWERK for various hardware items totaling 118.54 EUR issued on October 27, 2026.",
+    "line_items": [
+     {
+      "description": "SCREWS WOOD 4X40 200PC",
+      "amount": 7.49,
+      "quantity": 1,
+      "sku": null,
+      "unit": null,
+      "unit_price": 7.49
+     },
+     {
+      "description": "WALL PLUGS 6MM 100PC",
+      "amount": 6.58,
+      "quantity": 2,
+      "sku": null,
+      "unit": null,
+      "unit_price": 3.29
+     },
+     {
+      "description": "MASKING TAPE 48MM",
+      "amount": 8.97,
+      "quantity": 3,
+      "sku": null,
+      "unit": null,
+      "unit_price": 2.99
+     },
+     {
+      "description": "CORDLESS DRILL 18V",
+      "amount": 89,
+      "quantity": 1,
+      "sku": null,
+      "unit": null,
+      "unit_price": 89
+     },
+     {
+      "description": "SAFETY GLASSES",
+      "amount": 6.5,
+      "quantity": 1,
+      "sku": null,
+      "unit": null,
+      "unit_price": 6.5
+     }
+    ]
+   },
+   "checks": [
+    {
+     "ok": true,
+     "check": "line totals",
+     "detail": "qty x price = amount on every line"
+    },
+    {
+     "ok": true,
+     "check": "lines vs total",
+     "detail": "lines add up to 118.54"
+    },
+    {
+     "ok": true,
+     "check": "total",
+     "detail": "subtotal and tax add up to the total"
+    }
+   ],
+   "status": "booked",
+   "reason": "All checks passed"
+  },
+  {
+   "id": "m5",
+   "from": "\"Nordlicht Bürobedarf\" <info@nordlicht-buero.example>",
+   "subject": "Ihre Rechnung NL-55821",
+   "date": "2026-10-28T10:50:00.000Z",
+   "attachments": [
+    {
+     "name": "invoice-nordlicht.pdf",
+     "type": "application/pdf",
+     "bytes": 30742
+    }
+   ],
+   "steps": [
+    {
+     "step": "filter",
+     "result": "document found: invoice-nordlicht.pdf"
+    },
+    {
+     "step": "extract",
+     "result": "invoice from Nordlicht Bürobedarf GmbH, total 413.76 EUR"
+    },
+    {
+     "step": "check",
+     "result": "ok line totals; FAIL lines vs subtotal; ok total"
+    },
+    {
+     "step": "route",
+     "result": "needs_review"
+    }
+   ],
+   "extraction": {
+    "seconds": 6.4,
+    "model": "gemini-3.5-flash-lite"
+   },
+   "data": {
+    "document_type": "invoice",
+    "language": "de",
+    "vendor": {
+     "name": "Nordlicht Bürobedarf GmbH",
+     "address": "Mainufer 3, 63739 Aschaffenburg",
+     "email": "info@nordlicht-buero.example",
+     "phone": null,
+     "tax_id": null
+    },
+    "customer": {
+     "address": "Lindenallee 23, 63768 Hösbach",
+     "name": "Brandt Haustechnik e.K."
+    },
+    "document_number": {
+     "value": "NL-55821"
+    },
+    "issue_date": {
+     "value": "2026-10-22"
+    },
+    "due_date": {
+     "value": "2026-11-05"
+    },
+    "currency": "EUR",
+    "subtotal": {
+     "value": 347.7
+    },
+    "tax": {
+     "included_in_prices": false,
+     "rate_percent": 19,
+     "value": 66.06
+    },
+    "total": {
+     "value": 413.76
+    },
+    "discount": null,
+    "shipping": null,
+    "summary": "This is an invoice from Nordlicht Bürobedarf GmbH to Brandt Haustechnik e.K. for office supplies totaling 413.76 EUR.",
+    "line_items": [
+     {
+      "description": "Druckerpapier A4, 80 g, 5x500 Blatt",
+      "amount": 149.4,
+      "quantity": 6,
+      "sku": null,
+      "unit": "Karton",
+      "unit_price": 24.9
+     },
+     {
+      "description": "Toner schwarz, kompatibel TN-2420",
+      "amount": 115.5,
+      "quantity": 3,
+      "sku": null,
+      "unit": "Stk",
+      "unit_price": 38.5
+     },
+     {
+      "description": "Ordner breit, 8 cm, blau",
+      "amount": 49,
+      "quantity": 20,
+      "sku": null,
+      "unit": "Stk",
+      "unit_price": 2.45
+     },
+     {
+      "description": "Kugelschreiber, 50er Pack",
+      "amount": 23.8,
+      "quantity": 2,
+      "sku": null,
+      "unit": "Pack",
+      "unit_price": 11.9
+     }
+    ]
+   },
+   "checks": [
+    {
+     "ok": true,
+     "check": "line totals",
+     "detail": "qty x price = amount on every line"
+    },
+    {
+     "ok": false,
+     "check": "lines vs subtotal",
+     "detail": "lines add up to 337.70, document says 347.70"
+    },
+    {
+     "ok": true,
+     "check": "total",
+     "detail": "subtotal and tax add up to the total"
+    }
+   ],
+   "status": "needs_review",
+   "reason": "lines add up to 337.70, document says 347.70"
+  },
+  {
+   "id": "m6",
+   "from": "\"Kessler Rohr & Armatur\" <rechnung@kessler-rohr.example>",
+   "subject": "Erinnerung: Rechnung RE-2026-04187",
+   "date": "2026-10-29T07:30:00.000Z",
+   "attachments": [
+    {
+     "name": "invoice-de.pdf",
+     "type": "application/pdf",
+     "bytes": 34364
+    }
+   ],
+   "steps": [
+    {
+     "step": "filter",
+     "result": "document found: invoice-de.pdf"
+    },
+    {
+     "step": "extract",
+     "result": "invoice from Kessler Rohr & Armatur GmbH, total 1813.14 EUR"
+    },
+    {
+     "step": "check",
+     "result": "ok line totals; ok lines vs subtotal; ok total"
+    },
+    {
+     "step": "route",
+     "result": "duplicate"
+    }
+   ],
+   "extraction": {
+    "seconds": 3.5,
+    "model": "gemini-3.5-flash-lite"
+   },
+   "data": {
+    "document_type": "invoice",
+    "language": "de",
+    "vendor": {
+     "name": "Kessler Rohr & Armatur GmbH",
+     "address": "Hafenstraße 7, 63739 Aschaffenburg",
+     "email": "rechnung@kessler-rohr.example",
+     "phone": "06021 555 0140",
+     "tax_id": "DE000000000"
+    },
+    "customer": {
+     "address": "Lindenallee 23, 63768 Hösbach",
+     "name": "Brandt Haustechnik e.K."
+    },
+    "document_number": {
+     "value": "RE-2026-04187"
+    },
+    "issue_date": {
+     "value": "2026-10-14"
+    },
+    "due_date": {
+     "value": "2026-10-28"
+    },
+    "currency": "EUR",
+    "subtotal": {
+     "value": 1523.65
+    },
+    "tax": {
+     "included_in_prices": false,
+     "rate_percent": 19,
+     "value": 289.49
+    },
+    "total": {
+     "value": 1813.14
+    },
+    "discount": null,
+    "shipping": null,
+    "summary": "This is an invoice from Kessler Rohr & Armatur GmbH to Brandt Haustechnik e.K. for plumbing supplies amounting to 1,813.14 EUR.",
+    "line_items": [
+     {
+      "description": "Kupferrohr 22 x 1,0 mm, Stange 5 m",
+      "amount": 466.8,
+      "quantity": 12,
+      "sku": "10-2241",
+      "unit": "Stk",
+      "unit_price": 38.9
+     },
+     {
+      "description": "Kupferrohr 15 x 1,0 mm, Stange 5 m",
+      "amount": 490,
+      "quantity": 20,
+      "sku": "10-1540",
+      "unit": "Stk",
+      "unit_price": 24.5
+     },
+     {
+      "description": "Pressfitting Bogen 90° 22 mm",
+      "amount": 194,
+      "quantity": 40,
+      "sku": "31-0022",
+      "unit": "Stk",
+      "unit_price": 4.85
+     },
+     {
+      "description": "Pressfitting T-Stück 15 mm",
+      "amount": 138.25,
+      "quantity": 35,
+      "sku": "31-0015",
+      "unit": "Stk",
+      "unit_price": 3.95
+     },
+     {
+      "description": "Kugelhahn DN 25, Messing, PN 40",
+      "amount": 165.6,
+      "quantity": 6,
+      "sku": "55-7100",
+      "unit": "Stk",
+      "unit_price": 27.6
+     },
+     {
+      "description": "Rohrschelle M8 Gr. 22 mit Gummieinlage",
+      "amount": 69,
+      "quantity": 60,
+      "sku": "72-0300",
+      "unit": "Stk",
+      "unit_price": 1.15
+     }
+    ]
+   },
+   "checks": [
+    {
+     "ok": true,
+     "check": "line totals",
+     "detail": "qty x price = amount on every line"
+    },
+    {
+     "ok": true,
+     "check": "lines vs subtotal",
+     "detail": "lines add up to 1523.65"
+    },
+    {
+     "ok": true,
+     "check": "total",
+     "detail": "subtotal and tax add up to the total"
+    }
+   ],
+   "status": "duplicate",
+   "reason": "Same vendor and number as email m1"
+  }
+ ],
+ "finished": "2026-11-01T19:38:31.589Z"
+}

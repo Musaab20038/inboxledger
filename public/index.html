@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>InboxLedger</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Invoices arrive by email and land in your ledger: extracted with AI, checked with code, de-duplicated, ready to book.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='7' width='26' height='18' rx='3' fill='%23233a5e'/%3E%3Cpath d='M4 9l12 9 12-9' stroke='%23ffd34d' stroke-width='2.5' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a mail sorting desk. Left the inbox tray, middle the checking station, right the ledger book. Each email travels left to right and gets a stamp. */
+:root{
+  --bg:#eef0f3; --surface:#ffffff; --surface-2:#f5f6f8; --ink:#17202b; --muted:#5d6876; --line:#d9dee5;
+  --brand:#233a5e; --brand-ink:#ffffff; --accent:#2f5fa7; --accent-soft:#e3ebf7; --marker:#ffd34d;
+  --booked:#1f7a45; --booked-bg:#e1f3e8; --review:#b4532a; --review-bg:#fbe7dc; --dup:#5b6573; --dup-bg:#e8eaee; --skip:#7a7f87; --skip-bg:#f0f1f3;
+  --shadow:0 1px 2px rgba(23,32,43,.06),0 8px 24px rgba(23,32,43,.08);
+  --f-display:"Bricolage Grotesque","Public Sans",system-ui,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141b; --surface:#171e28; --surface-2:#1d2632; --ink:#e7ecf2; --muted:#9aa6b4; --line:#2b3644;
+  --brand:#e7ecf2; --brand-ink:#0f141b; --accent:#7fa6e6; --accent-soft:#1c2a40;
+  --booked:#62d08f; --booked-bg:#143022; --review:#f0a07a; --review-bg:#3a2216; --dup:#aab3bf; --dup-bg:#252d38; --skip:#8d949d; --skip-bg:#1f2630;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --surface:#171e28; --surface-2:#1d2632; --ink:#e7ecf2; --muted:#9aa6b4; --line:#2b3644;
+  --brand:#e7ecf2; --brand-ink:#0f141b; --accent:#7fa6e6; --accent-soft:#1c2a40;
+  --booked:#62d08f; --booked-bg:#143022; --review:#f0a07a; --review-bg:#3a2216; --dup:#aab3bf; --dup-bg:#252d38; --skip:#8d949d; --skip-bg:#1f2630;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.1;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.shell{max-width:1280px;margin:0 auto}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font:800 20px/1 var(--f-display);color:var(--ink);text-decoration:none}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.pill i{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:end;padding-block:12px 22px}
+.hero h1{font-size:clamp(32px,4.8vw,54px);font-weight:800}
+.hero h1 mark{background:linear-gradient(transparent 58%,var(--marker) 58% 92%,transparent 92%);color:inherit;padding:0 .05em}
+.hero .lede{margin-top:12px;font-size:17px;color:var(--muted);max-width:52ch}
+.runbox{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 18px;font-weight:600;font-size:15px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn.primary:hover{filter:brightness(1.12)}
+.btn.small{padding:7px 12px;font-size:13px;border-radius:9px}
+.btn[disabled]{opacity:.55;cursor:default}
+.tally{display:flex;flex-wrap:wrap;gap:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;white-space:nowrap}
+.tag .n{font-family:var(--f-mono)}
+.booked{background:var(--booked-bg);color:var(--booked)} .needs_review{background:var(--review-bg);color:var(--review)}
+.duplicate{background:var(--dup-bg);color:var(--dup)} .skipped{background:var(--skip-bg);color:var(--skip)}
+.waiting{background:var(--surface-2);color:var(--muted)} .working{background:var(--accent-soft);color:var(--accent)}
+
+.desk{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr) minmax(0,1.5fr);gap:16px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);min-width:0;display:flex;flex-direction:column}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.panel-head h2{font-size:16px;font-family:var(--f-body);font-weight:600;letter-spacing:0}
+.panel-head small{color:var(--muted);font-size:12.5px}
+.step-k{font:500 11px/1 var(--f-mono);color:var(--accent);letter-spacing:.05em}
+
+.mail{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:3px solid transparent;text-align:left;width:100%;border-top:none;border-right:none}
+.mail:last-child{border-bottom:none}
+.mail:hover{background:var(--surface-2)}
+.mail.sel{background:var(--accent-soft);border-left-color:var(--accent)}
+.mail .ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--surface-2);color:var(--muted);font-size:14px}
+.mail .t{min-width:0;display:flex;flex-direction:column;gap:2px}
+.mail .from{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail .subj{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:3px}
+.att{font:500 11.5px var(--f-mono);color:var(--muted)}
+
+.station{padding:16px;display:flex;flex-direction:column;gap:14px}
+.station .empty{color:var(--muted);font-size:14px;padding:30px 4px;text-align:center}
+.doc-preview{border-radius:8px;border:1px solid var(--line);overflow:hidden;background:#fff;max-height:240px}
+.doc-preview img{display:block;width:100%;height:auto}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.steps li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:start;font-size:14px}
+.steps .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;margin-top:1px}
+.steps li.done .dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.steps li.fail .dot{background:var(--review);border-color:var(--review);color:#fff}
+.steps li.busy .dot{border-color:var(--accent);border-top-color:transparent;animation:spin .8s linear infinite}
+.steps li .sn{font-weight:600}
+.steps li .sd{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+@keyframes spin{to{transform:rotate(360deg)}}
+.verdict{border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.verdict b{font-size:15px}
+.verdict span{font-size:13.5px}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:13.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+
+.ledger-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:left;padding:9px 10px;background:var(--surface-2);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td.r,th.r{text-align:right}
+td.v{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr.row-in{animation:rowin .5s ease}
+@keyframes rowin{from{background:var(--marker)}to{background:transparent}}
+tr.clickable{cursor:pointer} tr.clickable:hover td{background:var(--surface-2)}
+.ledger-empty{padding:30px 16px;color:var(--muted);font-size:14px;text-align:center}
+.ledger-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.totals{font-family:var(--f-mono);color:var(--ink)}
+
+.how{margin-top:34px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.how div{padding:16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:6px}
+.how h3{font-size:16px}
+.how p{font-size:13.5px;color:var(--muted)}
+.connect{margin-top:14px;padding:18px;border-radius:14px;background:var(--accent-soft);display:flex;flex-direction:column;gap:8px}
+.connect h3{font-size:17px}
+.connect p{font-size:14px;max-width:80ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chips span{font-size:12.5px;font-weight:500;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+footer{margin-top:28px;font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+footer a{color:inherit}
+
+@media (max-width:1060px){.desk{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ledger{grid-column:1 / -1}.how{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.hero{grid-template-columns:1fr}.desk{grid-template-columns:1fr}.how{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="top">
+  <a class="logo" href="#" aria-label="InboxLedger home">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="3" fill="currentColor"/><path d="M4 9l12 9 12-9" stroke="#ffd34d" stroke-width="2.5" fill="none"/></svg>
+    InboxLedger
+  </a>
+  <span class="pill" id="run-pill"><i></i><span id="run-meta">Recorded run</span></span>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>Invoices arrive by email. <mark>They land in your ledger.</mark></h1>
+    <p class="lede">InboxLedger reads incoming emails, pulls the invoice data out of the attachments with AI, checks the math, catches duplicates and sorts everything into booked, needs review or skipped.</p>
+  </div>
+  <div class="runbox">
+    <button class="btn primary" id="run-btn" type="button">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
+      Process the inbox
+    </button>
+    <div class="tally" id="tally"></div>
+  </div>
+</section>
+
+<section class="desk">
+  <div class="panel">
+    <div class="panel-head"><div><span class="step-k">01 · INBOX</span><h2>Incoming email</h2></div><small id="inbox-count"></small></div>
+    <div id="inbox"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div><span class="step-k">02 · CHECK</span><h2>What happened</h2></div><small id="station-label"></small></div>
+    <div class="station" id="station"><p class="empty">Press <b>Process the inbox</b>, or pick an email to see each step.</p></div>
+  </div>
+
+  <div class="panel ledger">
+    <div class="panel-head"><div><span class="step-k">03 · LEDGER</span><h2>Booking ledger</h2></div><small>Click a row for details</small></div>
+    <div class="ledger-wrap" id="ledger"><p class="ledger-empty">Booked invoices will appear here.</p></div>
+    <div class="ledger-foot">
+      <span>Open: <span class="totals" id="totals">–</span></span>
+      <span style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn small" href="data/ledger.xlsx" download>Excel</a>
+        <a class="btn small" href="data/ledger.csv" download>CSV</a>
+      </span>
+    </div>
+  </div>
+</section>
+
+<section class="how" aria-label="How it works">
+  <div><span class="step-k">FILTER</span><h3>Only real documents</h3><p>Emails without a PDF or image are skipped. Newsletters never reach the AI.</p></div>
+  <div><span class="step-k">EXTRACT</span><h3>AI reads the invoice</h3><p>Google Gemini returns vendor, number, dates, line items and totals as structured data.</p></div>
+  <div><span class="step-k">VERIFY</span><h3>Code checks the math</h3><p>Line totals, subtotal, tax and total are recalculated. A mismatch goes to review, never into the books.</p></div>
+  <div><span class="step-k">DEDUPE</span><h3>No double payments</h3><p>A reminder with the same invoice attached is recognised by vendor and number and marked as a duplicate.</p></div>
+</section>
+
+<section class="connect">
+  <h3>Connects to the tools a business already uses</h3>
+  <p>The pipeline reads standard email files and writes a ledger. For a client it runs on a schedule against their mailbox and books into their spreadsheet or accounting tool, through an automation platform or a small script on their own account.</p>
+  <div class="chips"><span>Gmail</span><span>Outlook</span><span>Google Sheets</span><span>Excel</span><span>n8n</span><span>Activepieces</span><span>Xero (draft bills)</span></div>
+</section>
+
+<footer>
+  <span>InboxLedger · AI email-to-ledger automation demo · <a href="https://github.com/Musaab20038/inboxledger">Source on GitHub</a></span>
+  <span>All emails, companies and invoices are invented for this demo.</span>
+</footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const val = (o) => (o && typeof o === "object" ? o.value : o);
+const LABEL = { booked: "Booked", needs_review: "Needs review", duplicate: "Duplicate", skipped: "Skipped", waiting: "Waiting", working: "Processing" };
+const ICON = { booked: "✓", needs_review: "!", duplicate: "=", skipped: "–" };
+const money = (v, c) => v == null || v === "" ? "—" : new Intl.NumberFormat("en-US", { style: "currency", currency: c || "EUR" }).format(Number(v));
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const sleep = (ms) => new Promise((r) => setTimeout(r, reduced ? 0 : ms));
+
+let run = null, state = {}, selected = null, running = false, booked = [];
+
+const fromName = (f) => (f || "").replace(/^"?([^"<]+)"?\s*<.*$/, "$1").trim() || f;
+
+function renderInbox() {
+  $("#inbox-count").textContent = `${run.emails.length} emails`;
+  $("#inbox").innerHTML = run.emails.map((e) => {
+    const st = state[e.id] || "waiting";
+    const att = e.attachments.length ? `<span class="att">📎 ${esc(e.attachments[0].name)}</span>` : `<span class="att">no attachment</span>`;
+    return `<button class="mail${selected === e.id ? " sel" : ""}" data-id="${e.id}" type="button">
+      <span class="ico" aria-hidden="true">✉</span>
+      <span class="t"><span class="from">${esc(fromName(e.from))}</span><span class="subj">${esc(e.subject)}</span>
+      <span class="meta"><span class="tag ${st}">${LABEL[st]}</span>${att}</span></span></button>`;
+  }).join("");
+}
+
+function renderTally() {
+  const done = run.emails.filter((e) => ["booked", "needs_review", "duplicate", "skipped"].includes(state[e.id]));
+  const c = (s) => done.filter((e) => state[e.id] === s).length;
+  $("#tally").innerHTML = ["booked", "needs_review", "duplicate", "skipped"].map((s) => `<span class="tag ${s}"><span class="n">${c(s)}</span> ${LABEL[s]}</span>`).join("");
+}
+
+function stepsHtml(e, upto) {
+  const d = e.data;
+  const rows = [];
+  const hasDoc = e.attachments.some((a) => /pdf|image/.test(a.type));
+  rows.push({ n: "Filter", d: hasDoc ? `Document found: ${e.attachments[0].name}` : "No PDF or image attached", ok: true });
+  if (hasDoc && d) {
+    rows.push({ n: "Extract", d: `${d.document_type} from ${d.vendor?.name || "?"} · ${money(val(d.total), d.currency)} · ${e.extraction?.seconds ?? "?"} s`, ok: true });
+    (e.checks || []).forEach((c) => rows.push({ n: "Check " + c.check, d: c.detail, ok: c.ok }));
+    if (e.status === "duplicate") rows.push({ n: "Duplicate check", d: e.reason, ok: false });
+    else rows.push({ n: "Duplicate check", d: "Not seen before", ok: true });
+  }
+  return `<ol class="steps">${rows.map((r, i) => {
+    const cls = i < upto ? (r.ok ? "done" : "fail") : i === upto ? "busy" : "";
+    return `<li class="${cls}"><span class="dot" aria-hidden="true">${i < upto ? (r.ok ? "✓" : "!") : ""}</span><span><span class="sn">${esc(r.n)}</span><br><span class="sd">${esc(r.d)}</span></span></li>`;
+  }).join("")}</ol>`;
+}
+const stepCount = (e) => (e.data ? 2 + (e.checks || []).length + 1 : 1);
+
+function renderStation(e, upto = Infinity, showVerdict = true) {
+  selected = e.id;
+  $("#station-label").textContent = e.id.toUpperCase();
+  const d = e.data;
+  const preview = e.attachments.length && /pdf|image/.test(e.attachments[0].type) ? `<div class="doc-preview"><img src="previews/${e.id}.jpg" alt="Attachment of email ${esc(e.subject)}"></div>` : "";
+  const verdict = showVerdict ? `<div class="verdict ${e.status}"><b>${ICON[e.status]} ${LABEL[e.status]}</b><span>${esc(e.reason)}</span></div>` : "";
+  const facts = d && showVerdict ? `<dl class="kv">
+      <dt>Vendor</dt><dd>${esc(d.vendor?.name)}</dd><dt>Number</dt><dd class="mono">${esc(val(d.document_number))}</dd>
+      <dt>Issued</dt><dd>${esc(val(d.issue_date) || "—")}</dd><dt>Due</dt><dd>${esc(val(d.due_date) || "—")}</dd>
+      <dt>Total</dt><dd class="mono">${esc(money(val(d.total), d.currency))}</dd><dt>Lines</dt><dd>${(d.line_items || []).length}</dd></dl>` : "";
+  $("#station").innerHTML = `<div><b style="font-size:15px">${esc(e.subject)}</b><p class="att" style="margin-top:2px">${esc(fromName(e.from))}</p></div>${preview}${stepsHtml(e, Math.min(upto, stepCount(e)))}${verdict}${facts}`;
+  renderInbox();
+}
+
+function renderLedger(flashId) {
+  if (!booked.length) { $("#ledger").innerHTML = `<p class="ledger-empty">Booked invoices will appear here.</p>`; $("#totals").textContent = "–"; return; }
+  $("#ledger").innerHTML = `<table><thead><tr><th>Status</th><th>Vendor</th><th>No.</th><th>Due</th><th class="r">Total</th></tr></thead><tbody>
+    ${booked.map((e) => `<tr class="clickable${e.id === flashId ? " row-in" : ""}" data-id="${e.id}"><td><span class="tag ${e.status}">${LABEL[e.status]}</span></td>
+      <td class="v">${esc(e.data.vendor?.name)}</td><td class="mono">${esc(val(e.data.document_number))}</td><td>${esc(val(e.data.due_date) || "—")}</td>
+      <td class="r mono">${esc(money(val(e.data.total), e.data.currency))}</td></tr>`).join("")}</tbody></table>`;
+  const sums = {};
+  booked.filter((e) => e.status === "booked").forEach((e) => { sums[e.data.currency] = (sums[e.data.currency] || 0) + Number(val(e.data.total) || 0); });
+  $("#totals").textContent = Object.entries(sums).map(([c, v]) => money(v, c)).join(" + ") || "–";
+}
+
+async function play() {
+  if (running) return;
+  running = true; $("#run-btn").disabled = true;
+  state = {}; booked = []; renderLedger(); renderTally();
+  for (const e of run.emails) {
+    state[e.id] = "working"; renderStation(e, 0, false);
+    for (let i = 1; i <= stepCount(e); i++) { await sleep(i === 2 ? 700 : 350); renderStation(e, i, false); }
+    await sleep(250);
+    state[e.id] = e.status; renderStation(e);
+    if (e.data && e.status !== "skipped") { booked.push(e); renderLedger(e.id); }
+    renderTally();
+    await sleep(500);
+  }
+  running = false; $("#run-btn").disabled = false;
+  $("#run-btn").lastChild.textContent = " Run again";
+}
+
+function showFinal() {
+  run.emails.forEach((e) => (state[e.id] = e.status));
+  booked = run.emails.filter((e) => e.data && e.status !== "skipped");
+  renderTally(); renderLedger(); renderInbox();
+}
+
+document.addEventListener("click", (ev) => {
+  const m = ev.target.closest("[data-id]"); if (!m || running) return;
+  const e = run.emails.find((x) => x.id === m.dataset.id);
+  if (!state[e.id] || state[e.id] === "waiting") showFinal();
+  renderStation(e);
+  if (matchMedia("(max-width:700px)").matches) $("#station").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+});
+$("#run-btn").addEventListener("click", play);
+
+fetch("data/run.json").then((r) => r.json()).then((j) => {
+  run = j;
+  const d = new Date(run.started);
+  $("#run-meta").textContent = `Recorded real run · ${d.toISOString().slice(0, 10)} · Gemini 3.5 Flash-Lite`;
+  renderInbox(); renderTally();
+}).catch(() => { $("#station").innerHTML = `<p class="empty">The demo data could not be loaded. Please reload the page.</p>`; });
+})();
+</script>
+</body>
+</html>

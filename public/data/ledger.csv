@@ -1,0 +1,6 @@
+Status,Email date,From,Vendor,Document no.,Issue date,Due date,Currency,Net,Tax,Total,Note
+booked,2026-10-28,"""Kessler Rohr & Armatur"" <rechnung@kessler-rohr.example>",Kessler Rohr & Armatur GmbH,RE-2026-04187,2026-10-14,2026-10-28,EUR,1523.65,289.49,1813.14,All checks passed
+booked,2026-10-28,"""Bluegate Billing"" <billing@bluegate.example>",Bluegate Office Supply Co.,BG-10442,2026-10-21,2026-11-20,USD,2292,157.86,2380.26,All checks passed
+booked,2026-10-28,"""Jonas Brandt"" <jonas@brandt-haustechnik.example>",BAUMARKT HOLZWERK,4471,2026-10-27,,EUR,99.61,18.93,118.54,All checks passed
+needs_review,2026-10-28,"""Nordlicht Bürobedarf"" <info@nordlicht-buero.example>",Nordlicht Bürobedarf GmbH,NL-55821,2026-10-22,2026-11-05,EUR,347.7,66.06,413.76,"lines add up to 337.70, document says 347.70"
+duplicate,2026-10-29,"""Kessler Rohr & Armatur"" <rechnung@kessler-rohr.example>",Kessler Rohr & Armatur GmbH,RE-2026-04187,2026-10-14,2026-10-28,EUR,1523.65,289.49,1813.14,Same vendor and number as email m1

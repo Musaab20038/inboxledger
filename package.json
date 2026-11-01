@@ -1,0 +1,16 @@
+{
+  "name": "inboxledger",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Email-to-ledger automation: invoices arrive by email, get extracted with AI, checked, de-duplicated and booked into a spreadsheet.",
+  "type": "module",
+  "scripts": {
+    "run-inbox": "node pipeline/run.js samples/inbox out"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "mailparser": "^3.7.1"
+  },
+  "license": "MIT"
+}
