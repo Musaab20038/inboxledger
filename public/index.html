@@ -128,6 +128,10 @@ tr.clickable{cursor:pointer} tr.clickable:hover td{background:var(--surface-2)}
 .chips span{font-size:12.5px;font-weight:500;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
 footer{margin-top:28px;font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 footer a{color:inherit}
+.langs{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.langs button{border:0;background:none;padding:5px 11px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.langs button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.offer{background:var(--surface);border:1px solid var(--line)}
 
 @media (max-width:1060px){.desk{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ledger{grid-column:1 / -1}.how{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.hero{grid-template-columns:1fr}.desk{grid-template-columns:1fr}.how{grid-template-columns:1fr}}
@@ -142,18 +146,18 @@ footer a{color:inherit}
     <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="3" fill="currentColor"/><path d="M4 9l12 9 12-9" stroke="#ffd34d" stroke-width="2.5" fill="none"/></svg>
     InboxLedger
   </a>
-  <span class="pill" id="run-pill"><i></i><span id="run-meta">Recorded run</span></span>
+  <span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="pill" id="run-pill"><i></i><span id="run-meta">Recorded run</span></span><span class="langs" role="group" aria-label="Sprache / Language"><button type="button" data-lang="de">DE</button><button type="button" data-lang="en">EN</button></span></span>
 </header>
 
 <section class="hero">
   <div>
-    <h1>Invoices arrive by email. <mark>They land in your ledger.</mark></h1>
-    <p class="lede">InboxLedger reads incoming emails, pulls the invoice data out of the attachments with AI, checks the math, catches duplicates and sorts everything into booked, needs review or skipped.</p>
+    <h1 data-i18n="h1">Invoices arrive by email. <mark>They land in your ledger.</mark></h1>
+    <p class="lede" data-i18n="lede">InboxLedger reads incoming emails, pulls the invoice data out of the attachments with AI, checks the math, catches duplicates and sorts everything into booked, needs review or skipped.</p>
   </div>
   <div class="runbox">
     <button class="btn primary" id="run-btn" type="button">
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
-      Process the inbox
+      <span id="run-label">Process the inbox</span>
     </button>
     <div class="tally" id="tally"></div>
   </div>
@@ -161,20 +165,20 @@ footer a{color:inherit}
 
 <section class="desk">
   <div class="panel">
-    <div class="panel-head"><div><span class="step-k">01 · INBOX</span><h2>Incoming email</h2></div><small id="inbox-count"></small></div>
+    <div class="panel-head"><div><span class="step-k" data-i18n="k1">01 · INBOX</span><h2 data-i18n="p1">Incoming email</h2></div><small id="inbox-count"></small></div>
     <div id="inbox"></div>
   </div>
 
   <div class="panel">
-    <div class="panel-head"><div><span class="step-k">02 · CHECK</span><h2>What happened</h2></div><small id="station-label"></small></div>
-    <div class="station" id="station"><p class="empty">Press <b>Process the inbox</b>, or pick an email to see each step.</p></div>
+    <div class="panel-head"><div><span class="step-k" data-i18n="k2">02 · CHECK</span><h2 data-i18n="p2">What happened</h2></div><small id="station-label"></small></div>
+    <div class="station" id="station"><p class="empty" data-i18n="empty">Press <b>Process the inbox</b>, or pick an email to see each step.</p></div>
   </div>
 
   <div class="panel ledger">
-    <div class="panel-head"><div><span class="step-k">03 · LEDGER</span><h2>Booking ledger</h2></div><small>Click a row for details</small></div>
-    <div class="ledger-wrap" id="ledger"><p class="ledger-empty">Booked invoices will appear here.</p></div>
+    <div class="panel-head"><div><span class="step-k" data-i18n="k3">03 · LEDGER</span><h2 data-i18n="p3">Booking ledger</h2></div><small data-i18n="clickrow">Click a row for details</small></div>
+    <div class="ledger-wrap" id="ledger"><p class="ledger-empty" data-i18n="lempty">Booked invoices will appear here.</p></div>
     <div class="ledger-foot">
-      <span>Open: <span class="totals" id="totals">–</span></span>
+      <span><span data-i18n="open">Open:</span> <span class="totals" id="totals">–</span></span>
       <span style="display:flex;gap:8px;flex-wrap:wrap">
         <a class="btn small" href="data/ledger.xlsx" download>Excel</a>
         <a class="btn small" href="data/ledger.csv" download>CSV</a>
@@ -184,21 +188,27 @@ footer a{color:inherit}
 </section>
 
 <section class="how" aria-label="How it works">
-  <div><span class="step-k">FILTER</span><h3>Only real documents</h3><p>Emails without a PDF or image are skipped. Newsletters never reach the AI.</p></div>
-  <div><span class="step-k">EXTRACT</span><h3>AI reads the invoice</h3><p>Google Gemini returns vendor, number, dates, line items and totals as structured data.</p></div>
-  <div><span class="step-k">VERIFY</span><h3>Code checks the math</h3><p>Line totals, subtotal, tax and total are recalculated. A mismatch goes to review, never into the books.</p></div>
-  <div><span class="step-k">DEDUPE</span><h3>No double payments</h3><p>A reminder with the same invoice attached is recognised by vendor and number and marked as a duplicate.</p></div>
+  <div data-i18n="h_f"><span class="step-k">FILTER</span><h3>Only real documents</h3><p>Emails without a PDF or image are skipped. Newsletters never reach the AI.</p></div>
+  <div data-i18n="h_e"><span class="step-k">EXTRACT</span><h3>AI reads the invoice</h3><p>Google Gemini returns vendor, number, dates, line items and totals as structured data.</p></div>
+  <div data-i18n="h_v"><span class="step-k">VERIFY</span><h3>Code checks the math</h3><p>Line totals, subtotal, tax and total are recalculated. A mismatch goes to review, never into the books.</p></div>
+  <div data-i18n="h_d"><span class="step-k">DEDUPE</span><h3>No double payments</h3><p>A reminder with the same invoice attached is recognised by vendor and number and marked as a duplicate.</p></div>
 </section>
 
 <section class="connect">
-  <h3>Connects to the tools a business already uses</h3>
-  <p>The pipeline reads standard email files and writes a ledger. For a client it runs on a schedule against their mailbox and books into their spreadsheet or accounting tool, through an automation platform or a small script on their own account.</p>
-  <div class="chips"><span>Gmail</span><span>Outlook</span><span>Google Sheets</span><span>Excel</span><span>n8n</span><span>Activepieces</span><span>Xero (draft bills)</span></div>
+  <h3 data-i18n="c_h">Connects to the tools a business already uses</h3>
+  <p data-i18n="c_p">The pipeline reads standard email files and writes a ledger. For a client it runs on a schedule against their mailbox and books into their spreadsheet or accounting tool, through an automation platform or a small script on their own account.</p>
+  <div class="chips"><span>Gmail</span><span>Outlook</span><span>Google Sheets</span><span>Excel</span><span>n8n</span><span>Activepieces</span><span data-i18n="xero">Xero (draft bills)</span></div>
+</section>
+
+<section class="connect offer">
+  <h3 data-i18n="o_h">Free test with your own invoices</h3>
+  <p data-i18n="o_p">Send me 10 of your invoices, names blacked out if you like. Within 48 hours you get the result as an Excel file, free and without obligation.</p>
+  <p><a class="btn primary small" href="mailto:musaabalhamam8@gmail.com?subject=InboxLedger%20Test" data-i18n="o_btn">Email Musaab Al Hamam</a></p>
 </section>
 
 <footer>
-  <span>InboxLedger · AI email-to-ledger automation demo · <a href="https://github.com/Musaab20038/inboxledger">Source on GitHub</a></span>
-  <span>All emails, companies and invoices are invented for this demo.</span>
+  <span data-i18n="f1">InboxLedger · AI email-to-ledger automation demo · <a href="https://github.com/Musaab20038/inboxledger">Source on GitHub</a></span>
+  <span data-i18n="f2">All emails, companies and invoices are invented for this demo.</span>
 </footer>
 </div>
 
@@ -208,44 +218,113 @@ footer a{color:inherit}
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const val = (o) => (o && typeof o === "object" ? o.value : o);
-const LABEL = { booked: "Booked", needs_review: "Needs review", duplicate: "Duplicate", skipped: "Skipped", waiting: "Waiting", working: "Processing" };
+
+/* ---------- Sprache / language ---------- */
+const STATIC = { de: {
+  title: "InboxLedger – Rechnungen aus dem Postfach automatisch erfassen",
+  h1: 'Rechnungen kommen per E-Mail. <mark>Sie landen in Ihrer Buchhaltung.</mark>',
+  lede: "InboxLedger liest eingehende E-Mails, holt die Rechnungsdaten mit KI aus den Anhängen, rechnet nach, erkennt Dubletten und sortiert alles in gebucht, zu prüfen oder übersprungen.",
+  k1: "01 · POSTEINGANG", p1: "Eingehende E-Mails", k2: "02 · PRÜFUNG", p2: "Was passiert ist",
+  empty: "Klicken Sie auf <b>Posteingang verarbeiten</b> oder wählen Sie eine E-Mail, um jeden Schritt zu sehen.",
+  k3: "03 · JOURNAL", p3: "Buchungsjournal", clickrow: "Zeile anklicken für Details", lempty: "Gebuchte Rechnungen erscheinen hier.", open: "Offen:",
+  h_f: '<span class="step-k">FILTER</span><h3>Nur echte Dokumente</h3><p>E-Mails ohne PDF oder Bild werden übersprungen. Newsletter erreichen die KI nie.</p>',
+  h_e: '<span class="step-k">AUSLESEN</span><h3>KI liest die Rechnung</h3><p>Google Gemini liefert Lieferant, Nummer, Daten, Positionen und Summen als strukturierte Daten.</p>',
+  h_v: '<span class="step-k">PRÜFEN</span><h3>Code rechnet nach</h3><p>Positionen, Zwischensumme, Steuer und Gesamtbetrag werden nachgerechnet. Eine Abweichung geht zur Prüfung, nie in die Bücher.</p>',
+  h_d: '<span class="step-k">DUBLETTEN</span><h3>Keine Doppelzahlungen</h3><p>Eine Mahnung mit derselben Rechnung im Anhang wird an Lieferant und Nummer erkannt und als Dublette markiert.</p>',
+  c_h: "Passt zu den Werkzeugen, die Sie schon nutzen",
+  c_p: "Die Automatisierung liest Ihr Postfach nach Zeitplan und schreibt in Ihre Tabelle oder Ihr Buchhaltungsprogramm, über eine Automatisierungsplattform oder ein kleines Skript in Ihrem eigenen Konto. Ihre Daten bleiben bei Ihnen.",
+  o_h: "Kostenloser Test mit Ihren eigenen Rechnungen",
+  o_p: "Senden Sie mir 10 Ihrer Rechnungen, gern mit geschwärzten Namen. Innerhalb von 48 Stunden erhalten Sie das Ergebnis als Excel-Datei, kostenlos und unverbindlich.",
+  o_btn: "E-Mail an Musaab Al Hamam",
+  f1: 'InboxLedger · Demo: Rechnungen vom Postfach ins Journal · <a href="https://github.com/Musaab20038/inboxledger">Quellcode auf GitHub</a>',
+  f2: "Alle E-Mails, Firmen und Rechnungen in dieser Demo sind erfunden.",
+  xero: "Xero (Rechnungsentwürfe)",
+}};
+const TXT = {
+  en: { run: "Process the inbox", again: "Run again", emails: "emails", noatt: "no attachment", meta: "Recorded real run", loadErr: "The demo data could not be loaded. Please reload the page.",
+        labels: { booked: "Booked", needs_review: "Needs review", duplicate: "Duplicate", skipped: "Skipped", waiting: "Waiting", working: "Processing" },
+        kv: ["Vendor", "Number", "Issued", "Due", "Total", "Lines"], th: ["Status", "Vendor", "No.", "Due", "Total"],
+        filter: "Filter", extract: "Extract", check: "Check ", dup: "Duplicate check", notSeen: "Not seen before", found: "Document found: ", from: "from", attOf: "Attachment of email " },
+  de: { run: "Posteingang verarbeiten", again: "Noch einmal", emails: "E-Mails", noatt: "kein Anhang", meta: "Aufgezeichneter echter Durchlauf", loadErr: "Die Demo-Daten konnten nicht geladen werden. Bitte laden Sie die Seite neu.",
+        labels: { booked: "Gebucht", needs_review: "Zu prüfen", duplicate: "Dublette", skipped: "Übersprungen", waiting: "Wartet", working: "In Arbeit" },
+        kv: ["Lieferant", "Nummer", "Datum", "Fällig", "Gesamt", "Positionen"], th: ["Status", "Lieferant", "Nr.", "Fällig", "Gesamt"],
+        filter: "Filter", extract: "Auslesen", check: "Prüfung: ", dup: "Dublettenprüfung", notSeen: "Noch nicht vorgekommen", found: "Dokument gefunden: ", from: "von", attOf: "Anhang der E-Mail " },
+};
+const DE_TERMS = { "line totals": "Positionssummen", "lines vs subtotal": "Positionen und Zwischensumme", "lines vs total": "Positionen und Gesamtbetrag", total: "Gesamtbetrag", invoice: "Rechnung", receipt: "Beleg" };
+const deNum = (s) => s.replace(/\b(\d+)\.(\d{2})\b/g, (_, a, b) => Number(a).toLocaleString("de-DE") + "," + b);
+function tr(s) {
+  if (lang !== "de" || s == null) return s;
+  const t = String(s);
+  if (DE_TERMS[t]) return DE_TERMS[t];
+  const rules = [
+    [/^All checks passed$/, "Alle Prüfungen bestanden"],
+    [/^No PDF or image attached$/, "Kein PDF oder Bild im Anhang"],
+    [/^qty x price = amount on every line$/, "Menge × Preis = Betrag in jeder Zeile"],
+    [/^subtotal and tax add up to the total$/, "Zwischensumme plus Steuer ergibt den Gesamtbetrag"],
+    [/^lines add up to ([\d.]+), document says ([\d.]+)$/, "Positionen ergeben $1, die Rechnung nennt $2"],
+    [/^lines add up to ([\d.]+)$/, "Positionen ergeben $1"],
+    [/^Same vendor and number as email (\w+)$/, "Gleicher Lieferant und gleiche Nummer wie E-Mail $1"],
+  ];
+  for (const [re, out] of rules) if (re.test(t)) return deNum(t.replace(re, out));
+  return t;
+}
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const qp = new URLSearchParams(location.search).get("lang");
+let lang = ["de", "en"].includes(qp) ? qp : store.get("il-lang") || ((navigator.language || "").toLowerCase().startsWith("de") ? "de" : "en");
+const EN_STATIC = {};
+document.querySelectorAll("[data-i18n]").forEach((el) => (EN_STATIC[el.dataset.i18n] = el.innerHTML));
+const EN_TITLE = document.title;
+const L = () => TXT[lang];
+const LABEL = (s) => L().labels[s];
 const ICON = { booked: "✓", needs_review: "!", duplicate: "=", skipped: "–" };
-const money = (v, c) => v == null || v === "" ? "—" : new Intl.NumberFormat("en-US", { style: "currency", currency: c || "EUR" }).format(Number(v));
+const money = (v, c) => v == null || v === "" ? "—" : new Intl.NumberFormat(lang === "de" ? "de-DE" : "en-US", { style: "currency", currency: c || "EUR" }).format(Number(v));
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduced ? 0 : ms));
 
-let run = null, state = {}, selected = null, running = false, booked = [];
+let run = null, state = {}, selected = null, running = false, booked = [], played = false;
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.title = lang === "de" ? STATIC.de.title : EN_TITLE;
+  document.querySelectorAll("[data-i18n]").forEach((el) => { const k = el.dataset.i18n; el.innerHTML = lang === "de" ? STATIC.de[k] : EN_STATIC[k]; });
+  document.querySelectorAll(".langs button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  $("#run-label").textContent = played ? L().again : L().run;
+  if (!run) return;
+  setMeta(); renderInbox(); renderTally(); renderLedger();
+  const e = run.emails.find((x) => x.id === selected); if (e && !running) renderStation(e);
+}
+function setMeta() { $("#run-meta").textContent = `${L().meta} · ${new Date(run.started).toISOString().slice(0, 10)} · Gemini 3.5 Flash-Lite`; }
 
 const fromName = (f) => (f || "").replace(/^"?([^"<]+)"?\s*<.*$/, "$1").trim() || f;
 
 function renderInbox() {
-  $("#inbox-count").textContent = `${run.emails.length} emails`;
+  $("#inbox-count").textContent = `${run.emails.length} ${L().emails}`;
   $("#inbox").innerHTML = run.emails.map((e) => {
     const st = state[e.id] || "waiting";
-    const att = e.attachments.length ? `<span class="att">📎 ${esc(e.attachments[0].name)}</span>` : `<span class="att">no attachment</span>`;
+    const att = e.attachments.length ? `<span class="att">📎 ${esc(e.attachments[0].name)}</span>` : `<span class="att">${L().noatt}</span>`;
     return `<button class="mail${selected === e.id ? " sel" : ""}" data-id="${e.id}" type="button">
       <span class="ico" aria-hidden="true">✉</span>
       <span class="t"><span class="from">${esc(fromName(e.from))}</span><span class="subj">${esc(e.subject)}</span>
-      <span class="meta"><span class="tag ${st}">${LABEL[st]}</span>${att}</span></span></button>`;
+      <span class="meta"><span class="tag ${st}">${LABEL(st)}</span>${att}</span></span></button>`;
   }).join("");
 }
 
 function renderTally() {
   const done = run.emails.filter((e) => ["booked", "needs_review", "duplicate", "skipped"].includes(state[e.id]));
   const c = (s) => done.filter((e) => state[e.id] === s).length;
-  $("#tally").innerHTML = ["booked", "needs_review", "duplicate", "skipped"].map((s) => `<span class="tag ${s}"><span class="n">${c(s)}</span> ${LABEL[s]}</span>`).join("");
+  $("#tally").innerHTML = ["booked", "needs_review", "duplicate", "skipped"].map((s) => `<span class="tag ${s}"><span class="n">${c(s)}</span> ${LABEL(s)}</span>`).join("");
 }
 
 function stepsHtml(e, upto) {
-  const d = e.data;
+  const d = e.data, t = L();
   const rows = [];
   const hasDoc = e.attachments.some((a) => /pdf|image/.test(a.type));
-  rows.push({ n: "Filter", d: hasDoc ? `Document found: ${e.attachments[0].name}` : "No PDF or image attached", ok: true });
+  rows.push({ n: t.filter, d: hasDoc ? `${t.found}${e.attachments[0].name}` : tr("No PDF or image attached"), ok: true });
   if (hasDoc && d) {
-    rows.push({ n: "Extract", d: `${d.document_type} from ${d.vendor?.name || "?"} · ${money(val(d.total), d.currency)} · ${e.extraction?.seconds ?? "?"} s`, ok: true });
-    (e.checks || []).forEach((c) => rows.push({ n: "Check " + c.check, d: c.detail, ok: c.ok }));
-    if (e.status === "duplicate") rows.push({ n: "Duplicate check", d: e.reason, ok: false });
-    else rows.push({ n: "Duplicate check", d: "Not seen before", ok: true });
+    rows.push({ n: t.extract, d: `${tr(d.document_type)} ${t.from} ${d.vendor?.name || "?"} · ${money(val(d.total), d.currency)} · ${e.extraction?.seconds != null ? Number(e.extraction.seconds).toLocaleString(lang === "de" ? "de-DE" : "en-US") : "?"} s`, ok: true });
+    (e.checks || []).forEach((c) => rows.push({ n: t.check + tr(c.check), d: tr(c.detail), ok: c.ok }));
+    if (e.status === "duplicate") rows.push({ n: t.dup, d: tr(e.reason), ok: false });
+    else rows.push({ n: t.dup, d: t.notSeen, ok: true });
   }
   return `<ol class="steps">${rows.map((r, i) => {
     const cls = i < upto ? (r.ok ? "done" : "fail") : i === upto ? "busy" : "";
@@ -256,22 +335,24 @@ const stepCount = (e) => (e.data ? 2 + (e.checks || []).length + 1 : 1);
 
 function renderStation(e, upto = Infinity, showVerdict = true) {
   selected = e.id;
+  const k = L().kv;
   $("#station-label").textContent = e.id.toUpperCase();
   const d = e.data;
-  const preview = e.attachments.length && /pdf|image/.test(e.attachments[0].type) ? `<div class="doc-preview"><img src="previews/${e.id}.jpg" alt="Attachment of email ${esc(e.subject)}"></div>` : "";
-  const verdict = showVerdict ? `<div class="verdict ${e.status}"><b>${ICON[e.status]} ${LABEL[e.status]}</b><span>${esc(e.reason)}</span></div>` : "";
+  const preview = e.attachments.length && /pdf|image/.test(e.attachments[0].type) ? `<div class="doc-preview"><img src="previews/${e.id}.jpg" alt="${L().attOf}${esc(e.subject)}"></div>` : "";
+  const verdict = showVerdict ? `<div class="verdict ${e.status}"><b>${ICON[e.status]} ${LABEL(e.status)}</b><span>${esc(tr(e.reason))}</span></div>` : "";
   const facts = d && showVerdict ? `<dl class="kv">
-      <dt>Vendor</dt><dd>${esc(d.vendor?.name)}</dd><dt>Number</dt><dd class="mono">${esc(val(d.document_number))}</dd>
-      <dt>Issued</dt><dd>${esc(val(d.issue_date) || "—")}</dd><dt>Due</dt><dd>${esc(val(d.due_date) || "—")}</dd>
-      <dt>Total</dt><dd class="mono">${esc(money(val(d.total), d.currency))}</dd><dt>Lines</dt><dd>${(d.line_items || []).length}</dd></dl>` : "";
+      <dt>${k[0]}</dt><dd>${esc(d.vendor?.name)}</dd><dt>${k[1]}</dt><dd class="mono">${esc(val(d.document_number))}</dd>
+      <dt>${k[2]}</dt><dd>${esc(val(d.issue_date) || "—")}</dd><dt>${k[3]}</dt><dd>${esc(val(d.due_date) || "—")}</dd>
+      <dt>${k[4]}</dt><dd class="mono">${esc(money(val(d.total), d.currency))}</dd><dt>${k[5]}</dt><dd>${(d.line_items || []).length}</dd></dl>` : "";
   $("#station").innerHTML = `<div><b style="font-size:15px">${esc(e.subject)}</b><p class="att" style="margin-top:2px">${esc(fromName(e.from))}</p></div>${preview}${stepsHtml(e, Math.min(upto, stepCount(e)))}${verdict}${facts}`;
   renderInbox();
 }
 
 function renderLedger(flashId) {
-  if (!booked.length) { $("#ledger").innerHTML = `<p class="ledger-empty">Booked invoices will appear here.</p>`; $("#totals").textContent = "–"; return; }
-  $("#ledger").innerHTML = `<table><thead><tr><th>Status</th><th>Vendor</th><th>No.</th><th>Due</th><th class="r">Total</th></tr></thead><tbody>
-    ${booked.map((e) => `<tr class="clickable${e.id === flashId ? " row-in" : ""}" data-id="${e.id}"><td><span class="tag ${e.status}">${LABEL[e.status]}</span></td>
+  const h = L().th;
+  if (!booked.length) { $("#ledger").innerHTML = `<p class="ledger-empty">${lang === "de" ? STATIC.de.lempty : EN_STATIC.lempty}</p>`; $("#totals").textContent = "–"; return; }
+  $("#ledger").innerHTML = `<table><thead><tr><th>${h[0]}</th><th>${h[1]}</th><th>${h[2]}</th><th>${h[3]}</th><th class="r">${h[4]}</th></tr></thead><tbody>
+    ${booked.map((e) => `<tr class="clickable${e.id === flashId ? " row-in" : ""}" data-id="${e.id}"><td><span class="tag ${e.status}">${LABEL(e.status)}</span></td>
       <td class="v">${esc(e.data.vendor?.name)}</td><td class="mono">${esc(val(e.data.document_number))}</td><td>${esc(val(e.data.due_date) || "—")}</td>
       <td class="r mono">${esc(money(val(e.data.total), e.data.currency))}</td></tr>`).join("")}</tbody></table>`;
   const sums = {};
@@ -292,8 +373,8 @@ async function play() {
     renderTally();
     await sleep(500);
   }
-  running = false; $("#run-btn").disabled = false;
-  $("#run-btn").lastChild.textContent = " Run again";
+  running = false; played = true; $("#run-btn").disabled = false;
+  $("#run-label").textContent = L().again;
 }
 
 function showFinal() {
@@ -303,6 +384,8 @@ function showFinal() {
 }
 
 document.addEventListener("click", (ev) => {
+  const lb = ev.target.closest(".langs button");
+  if (lb) { lang = lb.dataset.lang; store.set("il-lang", lang); applyLang(); return; }
   const m = ev.target.closest("[data-id]"); if (!m || running) return;
   const e = run.emails.find((x) => x.id === m.dataset.id);
   if (!state[e.id] || state[e.id] === "waiting") showFinal();
@@ -311,12 +394,10 @@ document.addEventListener("click", (ev) => {
 });
 $("#run-btn").addEventListener("click", play);
 
+applyLang();
 fetch("data/run.json").then((r) => r.json()).then((j) => {
-  run = j;
-  const d = new Date(run.started);
-  $("#run-meta").textContent = `Recorded real run · ${d.toISOString().slice(0, 10)} · Gemini 3.5 Flash-Lite`;
-  renderInbox(); renderTally();
-}).catch(() => { $("#station").innerHTML = `<p class="empty">The demo data could not be loaded. Please reload the page.</p>`; });
+  run = j; setMeta(); renderInbox(); renderTally();
+}).catch(() => { $("#station").innerHTML = `<p class="empty">${L().loadErr}</p>`; });
 })();
 </script>
 </body>
